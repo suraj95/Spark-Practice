@@ -1,0 +1,96 @@
+####################################
+Problem
+####################################
+
+1) Read json data (from FeDirector.data file)
+2) extract ip,storageid,directorid,metricid,value,ts
+
+note: storageidlist,fedirectorList,portMetricDataList,data is inside Iteration array. for each pair new row must be generated
+
+####################################
+Solution to Problem
+####################################
+
+// Read json file into IP dataframe
+
+val ip_df = spark.read.option("multiline",true).json("FEDirector_port_data.txt")
+ip_df.printSchema()
+ip_df.show()
+
+
+// Select storageid
+
+ip_df.withColumn("storageid-flat",explode($"storageidlist.storageid")).show()
+
+
+// Select directorid
+
+ip_df.withColumn("storageid-flat",explode($"storageidlist.storageid")).withColumn("directorid-list", explode($"storageidlist.fedirectorList")).withColumn("directorId-flat", explode($"directorid-list.directorId")).show()
+
+
+// Select portMetricDataList
+
+ip_df.withColumn("storageid-flat",explode($"storageidlist.storageid")).withColumn("directorid-list", explode($"storageidlist.fedirectorList")).withColumn("directorId-flat", explode($"directorid-list.directorId")).withColumn("portMetricDataList", explode($"directorid-list.portMetricDataList")).show()
+
+
+// Drop useless columns
+
+val cleaned_df = ip_df.withColumn("storageid-flat",explode($"storageidlist.storageid")).withColumn("directorid-list", explode($"storageidlist.fedirectorList")).withColumn("directorId-flat", explode($"directorid-list.directorId")).withColumn("portMetricDataList", explode($"directorid-list.portMetricDataList")).drop("errorcode").drop("errormessage").drop("label").drop("status").drop("sublabel").drop("ts").drop("storageidlist").drop("directorid-list")
+cleaned_df.show()
+
+
+// Split portMetricDataList portMetricData-1 into portMetricData-2
+
+cleaned_df.withColumn("portMetricData-1", explode($"portMetricDataList".getItem(0))).withColumn("portMetricData-2", explode($"portMetricDataList".getItem(1)))show()
+
+val metric_df = cleaned_df.withColumn("portMetricData-1", explode($"portMetricDataList".getItem(0))).withColumn("portMetricData-2", explode($"portMetricDataList".getItem(1)))
+
+
+// Select metricid 
+
+val metricid_df= metric_df.withColumn("metricid-1",$"portMetricData-1.metricid").withColumn("metricid-2",$"portMetricData-2.metricid")
+metricid_df.show()
+
+
+// Select value and ts
+
+val data_df= metricid_df.withColumn("data-1-1",$"portMetricData-1.data".getItem(0)).withColumn("data-1-2",$"portMetricData-1.data".getItem(1)).withColumn("data-2-1",$"portMetricData-1.data".getItem(0)).withColumn("data-2-2",$"portMetricData-2.data".getItem(1))
+data_df.show()
+val final_df = data_df.drop("portMetricData-1","portMetricData-2")
+
+val answer_df= final_df.withColumn("value-1-1",$"data-1-1.value").withColumn("value-1-2",$"data-1-2.value").withColumn("ts-1-1",$"data-1-1.ts").withColumn("ts-1-2",$"data-1-2.ts")
+
+val FINAL = answer_df.drop("portMetricDataList", "data-1-1", "data-1-2", "data-2-1", "data-2-2")
+
+// Write dataframe to csv
+
+FINAL.write.csv("Assignment.csv")
+
+
+####################################
+Rough Work
+####################################
+
+df
+  .select(col("dc_id"), explode(array("source.*")) as "level1")
+
+// It's better to specify an array index whenever we work with array type columns. If we don't specify an
+// array index, we can go 1 level deeper and fetch all the corresponding struct elements in the next level,
+// but we can't go further. Thats why we were able to get storageid but no directorid. 
+
+df.withColumn("storageidlist",explode($"storageidlist")).show()
+
+ip_df.withColumn("storageid-flat",explode($"storageidlist.storageid")).withColumn("directorid-flat", explode($"storageidlist.fedirectorList.directorId")).show()
+
+
+// indexing
+df.withColumn("data", explode($"data"))
+  .withColumn("id", $"data".getItem(0))
+  .show()
+
+
+ip_df.selectExpr("storageidlist[0].fedirectorList.directorId")
+
+or
+
+ip_df.select($"storageidlist"(0).getField("fedirectorList").getField("directorId"))
