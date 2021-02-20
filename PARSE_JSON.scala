@@ -1,35 +1,29 @@
-####################################
-Problem
-####################################
+import org.apache.spark.sql.SparkSession
 
-1) Read json data (from FeDirector.data file)
-2) extract ip,storageid,directorid,metricid,value,ts
+val spark = SparkSession
+  .builder()
+  .appName("Spark SQL basic example")
+  .config("spark.some.config.option", "some-value")
+  .getOrCreate()
 
-note: storageidlist,fedirectorList,portMetricDataList,data is inside Iteration array. for each pair new row must be generated
-
-####################################
-Solution to Problem (to be Run in Spark Shell)
-####################################
+// For implicit conversions like converting RDDs to DataFrames
+import spark.implicits._
 
 // Read json file into IP dataframe
-
 val ip_df = spark.read.option("multiline",true).json("FEDirector_port_data.txt")
 ip_df.printSchema()
 ip_df.show()
 
 
 // Select storageid
-
 ip_df.withColumn("storageid-flat",explode($"storageidlist.storageid")).show()
 
 
 // Select directorid
-
 ip_df.withColumn("storageid-flat",explode($"storageidlist.storageid")).withColumn("directorid-list", explode($"storageidlist.fedirectorList")).withColumn("directorId-flat", explode($"directorid-list.directorId")).show()
 
 
 // Select portMetricDataList
-
 ip_df.withColumn("storageid-flat",explode($"storageidlist.storageid")).withColumn("directorid-list", explode($"storageidlist.fedirectorList")).withColumn("directorId-flat", explode($"directorid-list.directorId")).withColumn("portMetricDataList", explode($"directorid-list.portMetricDataList")).show()
 
 
@@ -67,30 +61,4 @@ val FINAL = answer_df.drop("portMetricDataList", "data-1-1", "data-1-2", "data-2
 FINAL.write.csv("Assignment.csv")
 
 
-####################################
-Rough Work
-####################################
 
-df
-  .select(col("dc_id"), explode(array("source.*")) as "level1")
-
-// It's better to specify an array index whenever we work with array type columns. If we don't specify an
-// array index, we can go 1 level deeper and fetch all the corresponding struct elements in the next level,
-// but we can't go further. Thats why we were able to get storageid but no directorid. 
-
-df.withColumn("storageidlist",explode($"storageidlist")).show()
-
-ip_df.withColumn("storageid-flat",explode($"storageidlist.storageid")).withColumn("directorid-flat", explode($"storageidlist.fedirectorList.directorId")).show()
-
-
-// indexing
-df.withColumn("data", explode($"data"))
-  .withColumn("id", $"data".getItem(0))
-  .show()
-
-
-ip_df.selectExpr("storageidlist[0].fedirectorList.directorId")
-
-or
-
-ip_df.select($"storageidlist"(0).getField("fedirectorList").getField("directorId"))
