@@ -35,13 +35,13 @@ ip_df.withColumn("storageid-flat",explode($"storageidlist.storageid")).withColum
 
 // Drop useless columns
 
-val cleaned_df = ip_df.withColumn("storageid-flat",explode($"storageidlist.storageid")).withColumn("directorid-list", explode($"storageidlist.fedirectorList")).withColumn("directorId-flat", explode($"directorid-list.directorId")).withColumn("portMetricDataList", explode($"directorid-list.portMetricDataList")).drop("errorcode").drop("errormessage").drop("label").drop("status").drop("sublabel").drop("ts").drop("storageidlist").drop("directorid-list")
+val cleaned_df = ip_df.withColumn("storageid-flat",explode($"storageidlist.storageid")).withColumn("directorid-list", explode($"storageidlist.fedirectorList")).withColumn("directorId-flat", explode($"directorid-list.directorId")).withColumn("portMetricDataList", explode($"directorid-list.portMetricDataList")).drop("errorcode").drop("errormessage").drop("label").drop("status").drop("sublabel").drop("storageidlist").drop("directorid-list")
 cleaned_df.show()
 
 
 // Split portMetricDataList portMetricData-1 into portMetricData-2
 
-cleaned_df.withColumn("portMetricData-1", explode($"portMetricDataList".getItem(0))).withColumn("portMetricData-2", explode($"portMetricDataList".getItem(1)))show()
+cleaned_df.withColumn("portMetricData-1", explode($"portMetricDataList".getItem(0))).withColumn("portMetricData-2", explode($"portMetricDataList".getItem(1))).show()
 
 val metric_df = cleaned_df.withColumn("portMetricData-1", explode($"portMetricDataList".getItem(0))).withColumn("portMetricData-2", explode($"portMetricDataList".getItem(1)))
 
