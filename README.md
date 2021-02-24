@@ -2,7 +2,7 @@
 
 1> Set SPARK_HOME environment variable to the location of Spark installation as follows
 
-	export SPARK_HOME="/Users/srpatil/Desktop/Suraj/Frameworks/spark-2.4.3-bin-hadoop2.7"
+	export SPARK_HOME="/Users/srpatil/Desktop/Suraj/Frameworks/spark-2.4.5-bin-hadoop2.7"
 
 2.> Set HOME variable 
 
@@ -47,3 +47,13 @@ and initialise it in code.
 	srpatil$  Jupyter notebook
 
 Then navigate to your notebook in the UI opened in the browser and open it.
+
+
+# References
+
+[Execute Scala scripts without creating Jar](https://bigdataprogrammers.com/how-to-execute-scala-script-in-spark-submit-without-creating-jar/)
+
+[Run Spark on Docker](https://github.com/suraj95/Spark-on-Docker)
+
+[Machine Learning Examples with PySpark](https://github.com/suraj95/ML_Spark)
+
