@@ -1,13 +1,15 @@
 import org.apache.spark.sql.SparkSession
+import spark.implicits._ // For implicit conversions like converting RDDs to DataFrames
 
-val spark = SparkSession
-  .builder()
-  .appName("Spark SQL basic example")
-  .config("spark.some.config.option", "some-value")
-  .getOrCreate()
 
-// For implicit conversions like converting RDDs to DataFrames
-import spark.implicits._
+// In the Spark shell you can wrap your multiple line Spark code in parenthesis to execute the code. 
+
+val spark = SparkSession(
+	.builder()
+	.appName("Spark SQL basic example")
+	.config("spark.some.config.option", "some-value")
+	.getOrCreate()
+)
 
 // Read json file into IP dataframe
 val ip_df = spark.read.option("multiline",true).json("FEDirector_port_data.txt")

@@ -10,7 +10,7 @@
 
 # Starting a Spark Application
 
-1> Type PySpark in the terminal
+1> Type spark-shell or pyspark (for python version) in the terminal and execute commands in the Spark Shell (REPL)
 
 2> View the Web UI at port 4040. It has Spark, Storage, Environment, SQL, Master and Executors.
 
@@ -30,12 +30,13 @@
 
 	spark-shell --master local[2]
 
-2> To run an example code, navigate to the Spark examples folder and then python
+2> To run an example code, navigate to the respective folder (like examples/src/main/python) and run the spark-submit command (with jars and conf files if needed)
 
 	spark-submit pi.py
 
-Or you can directly type code and execute in the Spark shell
+Or you can simply use the stdin redirection with spark-shell:
 
+	spark-shell < PARSE_JSON.scala
 
 # Running Spark on Jupyter
 
@@ -50,8 +51,6 @@ Then navigate to your notebook in the UI opened in the browser and open it.
 
 
 # References
-
-[Execute Scala scripts without creating Jar](https://bigdataprogrammers.com/how-to-execute-scala-script-in-spark-submit-without-creating-jar/)
 
 [Run Spark on Docker](https://github.com/suraj95/Spark-on-Docker)
 
