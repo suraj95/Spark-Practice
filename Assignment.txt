@@ -39,7 +39,7 @@ val cleaned_df = ip_df.withColumn("storageid-flat",explode($"storageidlist.stora
 cleaned_df.show()
 
 
-// Split portMetricDataList portMetricData-1 into portMetricData-2
+// Split portMetricDataList into portMetricData-1 and portMetricData-2
 
 cleaned_df.withColumn("portMetricData-1", explode($"portMetricDataList".getItem(0))).withColumn("portMetricData-2", explode($"portMetricDataList".getItem(1))).show()
 

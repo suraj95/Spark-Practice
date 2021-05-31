@@ -1,0 +1,11 @@
+{
+	"table": "SYSMAN.EM_METRIC_COLUMN_VER_E",
+	"op_type": "I",
+	"op_ts": "2021-03-24 13:15:31.396105",
+	"pos": "00000000000000000000",
+	"after": {
+		"METRIC_GROUP_ID": 4700,
+		"METRIC_COLUMN_ID": 293339,
+		"METRIC_GROUP_VERSION_ID": 41670
+	}
+}
