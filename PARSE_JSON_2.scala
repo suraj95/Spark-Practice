@@ -19,7 +19,13 @@ input_df.show()
 // To select inner JSON (not a list-- you need explode for that)
 input_df.select("after.*").show()
 
+// To select inner JSON from row
+for(a<-input_df){println(Try(a.getAs[String]("op_ts")).isSuccess)} //True
+for(a<-input_df){println(Try(a.getAs[Row]("after")).isSuccess)} //True
+for(a<-input_df){println(Try(a.getAs[Row]("after").getAs[Long]("METRIC_COLUMN_ID")).isSuccess)} //False
 
+//Filtering inner JSON values
+input_df.filter($"after.METRIC_GROUP_ID"===4700).show()
 
-
-
+// Convert dataframe into map object (for iteration) 
+val iterable=input_df.collect.map(r => Map(input_df.columns.zip(r.toSeq):_*))
