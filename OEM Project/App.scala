@@ -144,7 +144,7 @@ object oem_data_processing {
     //println(topics.mkString, kafka_topic_list.mkString)
 
     //If topics in config and table don't match, job must restart after change to config
-    // assert(topics.deep == kafka_topic_list.deep)  
+    assert(topics.deep == kafka_topic_list.deep)  
     
     // Define all the kafka properties for streaming
     val kafkaParams = Map[String, Object](
